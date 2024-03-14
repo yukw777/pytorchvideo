@@ -72,6 +72,7 @@ setup(
             "nbconvert",
             "bs4",
             "autoflake==1.4",
+            "mypy==1.9.0",
         ],
         "opencv-python": [
             "opencv-python",
