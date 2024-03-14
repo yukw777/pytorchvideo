@@ -33,6 +33,10 @@ def select_video_class(decoder: str) -> Video:
         from .encoded_video_decord import EncodedVideoDecord
 
         video_cls = EncodedVideoDecord
+    elif DecoderType(decoder) == DecoderType.PYAV_PARTIAL:
+        from .encoded_video_pyav_partial import EncodedVideoPyAVPartial
+
+        video_cls = EncodedVideoPyAVPartial
     else:
         raise NotImplementedError(f"Unknown decoder type {decoder}")
 

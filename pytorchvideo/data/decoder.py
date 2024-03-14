@@ -4,5 +4,6 @@ from enum import Enum
 
 class DecoderType(Enum):
     PYAV = "pyav"
+    PYAV_PARTIAL = "pyav_partial"
     TORCHVISION = "torchvision"
     DECORD = "decord"
