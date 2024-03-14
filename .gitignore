@@ -32,3 +32,6 @@ packaging/out/
 packaging/output_files/
 dist/
 wheels/
+
+## VSCode
+.vscode/
