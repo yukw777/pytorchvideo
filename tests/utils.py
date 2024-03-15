@@ -180,6 +180,7 @@ def write_audio_video(path, video, audio, fps=30, audio_rate=48000):
                 frame = video_array[encoded_video_index]
                 video_frame = av.VideoFrame.from_ndarray(frame, format="rgb24")
                 video_frame.pict_type = "NONE"
+                video_frame.pts = encoded_video_index
                 encoded_video_index += 1
                 for packet in video_stream.encode(video_frame):
                     container.mux(packet)
@@ -192,9 +193,10 @@ def write_audio_video(path, video, audio, fps=30, audio_rate=48000):
                     format="s16",
                     layout="stereo",
                 )
-                encoded_audio_index = encode_packet_end
                 audio_frame.rate = audio_rate
                 audio_frame.time_base = f"1/{audio_rate}"
+                audio_frame.pts = encoded_audio_index
+                encoded_audio_index = encode_packet_end
                 encoded_packets = audio_stream.encode(audio_frame)
                 for packet in encoded_packets:
                     container.mux(packet)
