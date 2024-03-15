@@ -42,7 +42,7 @@ class TestEncodedVideo(unittest.TestCase):
 
     def test_video_with_shorter_audio_works(self):
         num_audio_samples = 8000
-        num_frames = 5
+        num_frames = 10
         fps = 5
         audio_rate = 8000
         with temp_encoded_video_with_audio(
@@ -75,7 +75,7 @@ class TestEncodedVideo(unittest.TestCase):
         audio_rate = 10000
         fps = 5
         num_frames = 5
-        num_audio_samples = 40000
+        num_audio_samples = 50000
         with temp_encoded_video_with_audio(
             num_frames=num_frames,
             fps=fps,
@@ -102,7 +102,7 @@ class TestEncodedVideo(unittest.TestCase):
         audio_rate = 10000
         fps = 5
         num_frames = 5
-        num_audio_samples = 40000
+        num_audio_samples = 50000
         with temp_encoded_video_with_audio(
             num_frames=num_frames,
             fps=fps,
