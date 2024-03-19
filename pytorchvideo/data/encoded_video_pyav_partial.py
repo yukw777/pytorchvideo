@@ -382,23 +382,22 @@ def _transform_mvs_to_tensor(
                     start_x = mv.dst_x - mv.w // 2
                     start_y = mv.dst_y - mv.h // 2
 
+                    # macroblocks can go beyond the frame if the frame
+                    # is not evenly divisible by them.
+                    end_x = min(start_x + mv.w, frame.width)
+                    end_y = min(start_y + mv.h, frame.height)
+
                     # list0 (source == -1) is channel 0 and 1,
                     # and list1 (source == 1) is channel 2 and 3
                     channel_offset = mv.source + 1
 
                     # fill the x value
-                    frame_tensor[
-                        channel_offset,
-                        start_y : start_y + mv.h,
-                        start_x : start_x + mv.w,
-                    ] = val_x
+                    frame_tensor[channel_offset, start_y:end_y, start_x:end_x] = val_x
 
                     # fill the y value
-                    frame_tensor[
-                        channel_offset + 1,
-                        start_y : start_y + mv.h,
-                        start_x : start_x + mv.w,
-                    ] = val_y
+                    frame_tensor[channel_offset + 1, start_y:end_y, start_x:end_x] = (
+                        val_y
+                    )
 
             inter_frame_tensors.append((frame_tensor, frame.pts))
         inter_frame_tensor_list.append(inter_frame_tensors)
