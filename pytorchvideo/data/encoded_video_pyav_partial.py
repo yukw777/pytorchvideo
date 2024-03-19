@@ -382,8 +382,9 @@ def _transform_mvs_to_tensor(
                     start_x = mv.dst_x - mv.w // 2
                     start_y = mv.dst_y - mv.h // 2
 
-                    # list0 is channel 0 and 1, and list1 is channel 2 and 3
-                    channel_offset = 0 if mv.source == -1 else 2
+                    # list0 (source == -1) is channel 0 and 1,
+                    # and list1 (source == 1) is channel 2 and 3
+                    channel_offset = mv.source + 1
 
                     # fill the x value
                     frame_tensor[
