@@ -12,6 +12,7 @@ from pytorchvideo.data.video import VideoPathHandler
 
 from .labeled_video_paths import LabeledVideoPaths
 from .utils import MultiProcessSampler
+from .decoder import DecoderType
 
 
 logger = logging.getLogger(__name__)
@@ -171,7 +172,17 @@ class LabeledVideoDataset(torch.utils.data.IterableDataset):
                     loaded_clip_list = []
                     for i in range(len(clip_start)):
                         clip_dict = video.get_clip(clip_start[i], clip_end[i])
-                        if clip_dict is None or clip_dict["video"] is None:
+                        if (
+                            clip_dict is None
+                            or (
+                                self._decoder != DecoderType.PYAV_PARTIAL.value
+                                and clip_dict["video"] is None
+                            )
+                            or (
+                                self._decoder == DecoderType.PYAV_PARTIAL.value
+                                and clip_dict["key_frame"] is None
+                            )
+                        ):
                             self._loaded_clip = None
                             break
                         loaded_clip_list.append(clip_dict)
@@ -190,7 +201,15 @@ class LabeledVideoDataset(torch.utils.data.IterableDataset):
             self._last_clip_end_time = clip_end
 
             video_is_null = (
-                self._loaded_clip is None or self._loaded_clip["video"] is None
+                self._loaded_clip is None
+                or (
+                    self._decoder != DecoderType.PYAV_PARTIAL.value
+                    and self._loaded_clip["video"] is None
+                )
+                or (
+                    self._decoder == DecoderType.PYAV_PARTIAL.value
+                    and self._loaded_clip["key_frame"] is None
+                )
             )
             if (
                 is_last_clip[-1] if isinstance(is_last_clip, list) else is_last_clip
@@ -212,10 +231,18 @@ class LabeledVideoDataset(torch.utils.data.IterableDataset):
                     )
                     continue
 
-            frames = self._loaded_clip["video"]
+            if self._decoder == DecoderType.PYAV_PARTIAL.value:
+                video_frame_dict = {
+                    "key_frame": self._loaded_clip["key_frame"],
+                    "motion_vector": self._loaded_clip["motion_vector"],
+                    "residual": self._loaded_clip["residual"],
+                    "gop_num_inter_frame": self._loaded_clip["gop_num_inter_frame"],
+                }
+            else:
+                video_frame_dict = {"video": self._loaded_clip["video"]}
             audio_samples = self._loaded_clip["audio"]
             sample_dict = {
-                "video": frames,
+                **video_frame_dict,
                 "video_name": video.name,
                 "video_index": video_index,
                 "clip_index": clip_index,
