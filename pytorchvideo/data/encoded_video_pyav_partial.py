@@ -372,6 +372,12 @@ def _transform_mvs_to_tensor(
                     # other hand, for list1 (backward prediction), motion vectors point to
                     # where the macroblocks of the current frame will "move to."
 
+                    # some motion vectors are 0
+                    val_x = mv.src_x - mv.dst_x
+                    val_y = mv.src_y - mv.dst_y
+                    if val_x == 0 and val_y == 0:
+                        continue
+
                     # (dst_x, dst_y) is the center of the current macroblock
                     start_x = mv.dst_x - mv.w // 2
                     start_y = mv.dst_y - mv.h // 2
@@ -384,18 +390,14 @@ def _transform_mvs_to_tensor(
                         channel_offset,
                         start_y : start_y + mv.h,
                         start_x : start_x + mv.w,
-                    ] = (
-                        mv.src_x - mv.dst_x
-                    )
+                    ] = val_x
 
                     # fill the y value
                     frame_tensor[
                         channel_offset + 1,
                         start_y : start_y + mv.h,
                         start_x : start_x + mv.w,
-                    ] = (
-                        mv.src_y - mv.dst_y
-                    )
+                    ] = val_y
 
             inter_frame_tensors.append((frame_tensor, frame.pts))
         inter_frame_tensor_list.append(inter_frame_tensors)
